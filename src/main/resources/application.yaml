@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: spring.rest.api
+  datasource:
+    url: jdbc:postgresql://localhost:5433/jdt17-api
+    username: postgres
+    password: kikipoiu
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
