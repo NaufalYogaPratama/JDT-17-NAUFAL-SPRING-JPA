@@ -17,45 +17,34 @@ public class CustomerController {
 
     private final CustomerService service;
 
-    // CREATE
-    @PostMapping("/create")
-    public Customer create(
+    @PostMapping("/register")
+    public Customer register(
             @Valid @RequestBody CustomerRequest request) {
-
         return service.create(request);
     }
 
-    // READ ALL
-    @GetMapping("/all")
+    @GetMapping
     public List<Customer> getAll() {
-
         return service.getAll();
     }
 
-    // READ BY ID
     @GetMapping("/{id}")
     public Customer getById(
             @PathVariable UUID id) {
-
         return service.getById(id);
     }
 
-    // UPDATE
-    @PostMapping("/update/{id}")
+    @PostMapping("/{id}")
     public Customer update(
             @PathVariable UUID id,
             @Valid @RequestBody CustomerRequest request) {
-
         return service.update(id, request);
     }
 
-    // DELETE
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     public String delete(
             @PathVariable UUID id) {
-
         service.delete(id);
-
         return "Customer deleted";
     }
 }

@@ -51,7 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         repository.findByEmail(request.getEmail())
                 .ifPresent(existingCustomer -> {
-                    if (!existingCustomer.getId().equals(id)) {
+                    if (!existingCustomer.getCustomerId().equals(id)) {
                         throw new EmailAlreadyExistsException("Email is already registered");
                     }
                 });

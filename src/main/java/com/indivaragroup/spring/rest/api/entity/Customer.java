@@ -8,7 +8,7 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "customers")
+@Table(name = "mst_customer")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +17,8 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(name = "customer_id")
+    private UUID customerId;
 
     private String name;
 

@@ -19,8 +19,10 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,7 +53,7 @@ class CustomerControllerTest {
         validRequest.setAddress("Sudirman Street No. 12");
 
         customer = Customer.builder()
-                .id(customerId)
+                .customerId(customerId)
                 .name(validRequest.getName())
                 .email(validRequest.getEmail())
                 .phone(validRequest.getPhone())
@@ -63,11 +65,11 @@ class CustomerControllerTest {
     void createCustomer_Success() throws Exception {
         Mockito.when(customerService.create(any(CustomerRequest.class))).thenReturn(customer);
 
-        mockMvc.perform(post("/api/v1/customers/create")
+        mockMvc.perform(post("/api/v1/customers/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(customerId.toString())))
+                .andExpect(jsonPath("$.customerId", is(customerId.toString())))
                 .andExpect(jsonPath("$.name", is("John Doe")))
                 .andExpect(jsonPath("$.email", is("john.doe@example.com")));
     }
@@ -80,7 +82,7 @@ class CustomerControllerTest {
         invalidRequest.setPhone("081234567890");
         invalidRequest.setAddress("Sudirman Street No. 12");
 
-        mockMvc.perform(post("/api/v1/customers/create")
+        mockMvc.perform(post("/api/v1/customers/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
@@ -97,7 +99,7 @@ class CustomerControllerTest {
         invalidRequest.setPhone("081234567890");
         invalidRequest.setAddress("Sudirman Street No. 12");
 
-        mockMvc.perform(post("/api/v1/customers/create")
+        mockMvc.perform(post("/api/v1/customers/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
@@ -111,7 +113,7 @@ class CustomerControllerTest {
         Mockito.when(customerService.create(any(CustomerRequest.class)))
                 .thenThrow(new EmailAlreadyExistsException("Email is already registered"));
 
-        mockMvc.perform(post("/api/v1/customers/create")
+        mockMvc.perform(post("/api/v1/customers/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isBadRequest())
@@ -125,7 +127,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(get("/api/v1/customers/" + customerId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(customerId.toString())))
+                .andExpect(jsonPath("$.customerId", is(customerId.toString())))
                 .andExpect(jsonPath("$.name", is("John Doe")));
     }
 
@@ -139,5 +141,26 @@ class CustomerControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.message", containsString("Customer not found")));
+    }
+
+    @Test
+    void updateCustomer_Success() throws Exception {
+        Mockito.when(customerService.update(eq(customerId), any(CustomerRequest.class))).thenReturn(customer);
+
+        mockMvc.perform(post("/api/v1/customers/" + customerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.customerId", is(customerId.toString())))
+                .andExpect(jsonPath("$.name", is("John Doe")));
+    }
+
+    @Test
+    void deleteCustomer_Success() throws Exception {
+        Mockito.doNothing().when(customerService).delete(customerId);
+
+        mockMvc.perform(post("/api/v1/customers/" + customerId + "/delete"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Customer deleted"));
     }
 }

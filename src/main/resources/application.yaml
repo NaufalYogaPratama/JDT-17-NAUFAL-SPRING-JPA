@@ -10,3 +10,6 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+  bank:
+    transfer:
+      admin-fee: 2500
